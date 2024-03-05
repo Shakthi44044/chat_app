@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChatME</title>
+  <style>
+  </style>
+</head>
+<body>
+  <div id="messages"></div>
+  <form id="message-form">
+    <input type="text" id="username" placeholder="Username">
+    <input type="text" id="message" placeholder="Message">
+    <button type="submit">Send</button>
+  </form>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    // Function to append a new message to the chat window
+    function appendMessage(username, message) {
+      const messagesDiv = document.getElementById('messages');
+      const messageDiv = document.createElement('div');
+      messageDiv.textContent = `${username}: ${message}`;
+      messagesDiv.appendChild(messageDiv);
+    }
+    // Listen for incoming messages from the server
+    socket.on('message', (data) => {
+      appendMessage(data.username, data.message);
+    });
+    // Handle form submission to send a message
+    document.getElementById('message-form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const username = document.getElementById('username').value;
+      const message = document.getElementById('message').value;
+      if (username && message) {
+        socket.emit('message', { username, message });
+        document.getElementById('message').value = '';
+      }
+    });
+  </script>
+</body>
+</html>

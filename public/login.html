@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+</head>
+<body>
+    <form id="login-form">
+        <!-- Login form fields go here -->
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button type="submit">Login</button>
+    </form>
+    <p id="error-message"></p>
+
+    <script>
+        const loginForm = document.getElementById('login-form');
+        const errorMessage = document.getElementById('error-message');
+
+        loginForm.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevent default form submission
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Basic input validation (optional)
+            if (!username || !password) {
+                errorMessage.textContent = 'Please fill in all fields.';
+                return;
+            }
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    errorMessage.textContent = error.message; // Handle errors gracefully
+                    return;
+                }
+
+                const data = await response.json();
+
+                // Store session information or JWT (depending on your approach)
+                localStorage.setItem('token', data.token); // Replace with your session management
+
+                window.location.href = '/server.js'; // Redirect to chat page
+            } catch (error) {
+                console.error('Error logging in:', error);
+                errorMessage.textContent = 'An error occurred. Please try again later.';
+            }
+            
+            
+        });
+        
